@@ -3,267 +3,372 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ký Ức Trung Thu - Rằm Tháng Tám</title>
+    <title>Hồi Ức Đêm Rằm - Ký Ức Trung Thu</title>
 
-    <!-- Tailwind CSS CDN -->
+    <!-- Tailwind CSS (CDN) -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Font Awesome cho icon âm thanh -->
+    <!-- Font Awesome cho Icon -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Nunito:wght@300;400;600&display=swap" rel="stylesheet">
+    <!-- Google Fonts: Cinzel (nghệ thuật) & Montserrat (văn bản) -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
 
     <style>
-        /* Tùy chỉnh Font chữ */
+        /* --- CẤU HÌNH FONT & MÀU CHUNG --- */
         body {
-            font-family: 'Nunito', sans-serif;
-            background: radial-gradient(circle at center, #1e293b 0%, #020617 100%);
-            color: #e2e8f0;
+            font-family: 'Montserrat', sans-serif;
+            background-color: #0f172a; /* Nền dự phòng */
+            color: #f8fafc;
             overflow-x: hidden;
+            scroll-behavior: smooth;
         }
-        h1, h2, h3, .serif {
-            font-family: 'Playfair Display', serif;
+        .font-art {
+            font-family: 'Cinzel', serif;
         }
 
-        /* Lớp nền Canvas */
-        #firefliesCanvas {
+        /* --- BACKGROUND LAYER & CANVAS --- */
+        #bg-image {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1; /* Đặt phía sau mọi thành phần */
+            top: 0; left: 0; width: 100%; height: 100%;
+            /* Sử dụng ảnh họa tiết làm nền kết hợp lớp phủ tối */
+            background: linear-gradient(rgba(15, 23, 42, 0.8), rgba(2, 6, 23, 0.95)), 
+                        url('https://raw.githubusercontent.com/HoangNg-77/trung-thu-heritage/main/long%20den%20ngoi%20sao.jpg') center/cover no-repeat;
+            z-index: -3;
+        }
+        #bgCanvas {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -2;
             pointer-events: none;
         }
 
-        /* Hiệu ứng Glassmorphism & Phát sáng cho Card */
-        .glass-card {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            transition: all 0.4s ease;
-        }
-        
-        .glass-card:hover {
-            border-color: rgba(251, 191, 36, 0.5); /* Màu vàng hổ phách */
-            box-shadow: 0 0 25px rgba(251, 191, 36, 0.2);
-            transform: translateY(-5px);
-        }
-
-        /* Hiệu ứng chữ phát sáng */
-        .glow-text {
-            text-shadow: 0 0 15px rgba(251, 191, 36, 0.6), 0 0 30px rgba(251, 191, 36, 0.3);
-        }
-
-        /* Hoạt ảnh lồng đèn lơ lửng */
-        @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-15px); }
-            100% { transform: translateY(0px); }
+        /* --- HIỆU ỨNG ANIMATION CUSTOM --- */
+        /* 1. Lồng đèn bồng bềnh và phát sáng */
+        @keyframes float-glow {
+            0% { transform: translateY(0px); filter: drop-shadow(0 0 20px rgba(251, 191, 36, 0.5)); }
+            50% { transform: translateY(-20px); filter: drop-shadow(0 0 40px rgba(251, 191, 36, 0.9)); }
+            100% { transform: translateY(0px); filter: drop-shadow(0 0 20px rgba(251, 191, 36, 0.5)); }
         }
         .floating-lantern {
-            animation: float 4s ease-in-out infinite;
-            filter: drop-shadow(0 0 20px rgba(251, 191, 36, 0.5));
+            animation: float-glow 4s ease-in-out infinite;
+        }
+
+        /* 2. Nút âm thanh xoay chậm và phát sáng */
+        @keyframes spin-slow {
+            from { transform: rotate(0deg); box-shadow: 0 0 10px rgba(251,191,36,0.5); }
+            to { transform: rotate(360deg); box-shadow: 0 0 30px rgba(251,191,36,0.9); }
+        }
+        .music-playing {
+            animation: spin-slow 4s linear infinite;
+            border-color: #fbbf24 !important;
+            color: #fbbf24 !important;
+        }
+
+        /* 3. Hiệu ứng xuất hiện khi Scroll & Submit Lời chúc */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-up {
+            animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        /* 4. Glass Card (Thẻ kính mờ tương tác) */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.5s ease;
+            opacity: 0.85;
+        }
+        .glass-card:hover {
+            opacity: 1;
+            transform: scale(1.05) translateY(-10px);
+            border-color: #f59e0b;
+            box-shadow: 0 0 30px rgba(245, 158, 11, 0.4), inset 0 0 15px rgba(245, 158, 11, 0.1);
+            z-index: 10;
+        }
+
+        /* Scroll Reveal (Ẩn phần tử trước khi cuộn tới) */
+        .reveal {
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 1s ease-out;
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Hiệu ứng Glow Text */
+        .text-glow {
+            text-shadow: 0 0 20px rgba(251, 191, 36, 0.6);
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col relative">
+<body class="relative text-white">
 
-    <!-- Canvas Đom Đốm -->
-    <canvas id="firefliesCanvas"></canvas>
+    <!-- Lớp nền (Ảnh + Canvas) -->
+    <div id="bg-image"></div>
+    <canvas id="bgCanvas"></canvas>
 
-    <!-- Nút Bật/Tắt Âm Thanh -->
-    <!-- Ghi chú: Trình duyệt yêu cầu người dùng phải tương tác mới cho phát nhạc -->
-    <button id="audioToggle" class="fixed top-6 right-6 z-50 w-12 h-12 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-amber-400 text-xl flex items-center justify-center hover:bg-white/20 hover:scale-110 transition-all duration-300 shadow-[0_0_15px_rgba(251,191,36,0.2)]">
-        <i class="fa-solid fa-volume-xmark" id="audioIcon"></i>
+    <!-- Nút Âm Thanh Tương Tác -->
+    <button id="audioBtn" class="fixed top-6 right-6 z-50 w-14 h-14 rounded-full bg-white/5 backdrop-blur-md border border-white/20 text-white text-xl flex items-center justify-center transition-all duration-300 hover:scale-110">
+        <i class="fa-solid fa-music" id="audioIcon"></i>
     </button>
     
-    <!-- Link nhạc nền không bản quyền (Bạn có thể thay link nhạc Trung Thu mp3 của bạn vào thẻ src bên dưới) -->
+    <!-- Link nhạc nền (Bạn có thể đổi src thành "./nhac-nen.mp3" theo ý muốn) -->
     <audio id="bgMusic" loop>
-        <source src="https://cdn.pixabay.com/download/audio/2022/03/10/audio_517d68631b.mp3?filename=asian-lullaby-103681.mp3" type="audio/mpeg">
+        <source src="https://raw.githubusercontent.com/HoangNg-77/trung-thu-heritage/main/trung%20thu.mp3" type="audio/mpeg">
     </audio>
 
-    <!-- Nội dung chính -->
-    <main class="flex-grow container mx-auto px-6 py-12 flex flex-col items-center justify-center z-10">
-        
-        <!-- Phần Hero (Đầu trang) -->
-        <header class="text-center mt-10 mb-20 max-w-3xl flex flex-col items-center">
-            <h2 class="text-amber-500 tracking-[0.3em] uppercase text-sm font-semibold mb-4">Mùa Trăng Đoàn Viên</h2>
-            <h1 class="serif text-5xl md:text-7xl text-amber-300 font-bold mb-6 glow-text">RẰM THÁNG TÁM</h1>
-            <p class="text-lg md:text-xl text-gray-300 font-light italic mb-10">"Trăng rằm sáng tỏ đêm thu - Ký ức tuổi thơ vẫn mãi nguyên vẹn đong đầy."</p>
-            
-            <!-- Hình ảnh lồng đèn trung tâm -->
-            <div class="w-48 h-48 md:w-64 md:h-64 rounded-full overflow-hidden border-2 border-amber-500/30 p-2 floating-lantern">
-                <img src="https://images.unsplash.com/photo-1537237858032-23c21a1d957d?q=80&w=600&auto=format&fit=crop" 
+    <main class="w-full flex flex-col items-center">
+
+        <!-- 1. HERO SECTION (Khu vực Đầu trang) -->
+        <section class="relative min-h-screen w-full flex flex-col items-center justify-center pt-20 pb-10 px-4 text-center z-10">
+            <!-- Ảnh lồng đèn chính bồng bềnh -->
+            <div class="mb-8 relative floating-lantern">
+                <img src="https://raw.githubusercontent.com/HoangNg-77/trung-thu-heritage/main/long%20den.png" 
                      alt="Lồng Đèn Trung Thu" 
-                     class="w-full h-full object-cover rounded-full shadow-[inset_0_0_20px_rgba(0,0,0,0.8)]">
+                     class="w-64 h-auto md:w-80 object-contain drop-shadow-2xl">
             </div>
-        </header>
-
-        <!-- Phần Kỷ niệm (3 ô tương tác) -->
-        <section class="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-5xl mb-16">
             
-            <!-- Ô 1: Ánh Đèn -->
-            <div class="glass-card rounded-2xl p-8 text-center group">
-                <div class="w-16 h-16 mx-auto mb-6 rounded-full bg-amber-500/10 flex items-center justify-center text-amber-400 text-3xl group-hover:bg-amber-500/20 transition-all duration-300">
-                    <i class="fa-solid fa-lantern"></i>
-                </div>
-                <h3 class="serif text-2xl text-amber-300 mb-4">Ánh Đèn</h3>
-                <p class="text-gray-400 font-light leading-relaxed">Lung linh lồng đèn ông sao, đèn cá chép rực rỡ soi bóng những con ngõ nhỏ. Ánh sáng của tuổi thơ không bao giờ tắt.</p>
-            </div>
+            <h2 class="text-amber-500 tracking-[0.4em] uppercase text-sm md:text-base font-semibold mb-4">Câu chuyện mùa thu</h2>
+            <h1 class="font-art text-5xl md:text-7xl lg:text-8xl text-amber-300 font-bold mb-6 text-glow">HỒI ỨC ĐÊM RẰM</h1>
+            <p class="max-w-2xl text-lg text-gray-300 font-light italic leading-relaxed">
+                "Có những ký ức tựa như ánh trăng rằm, dù thời gian trôi qua bao lâu vẫn sáng tỏ một góc trời tuổi thơ."
+            </p>
 
-            <!-- Ô 2: Sắc Hội -->
-            <div class="glass-card rounded-2xl p-8 text-center group">
-                <div class="w-16 h-16 mx-auto mb-6 rounded-full bg-red-500/10 flex items-center justify-center text-red-400 text-3xl group-hover:bg-red-500/20 transition-all duration-300">
-                    <i class="fa-solid fa-drum"></i>
-                </div>
-                <h3 class="serif text-2xl text-red-300 mb-4">Sắc Hội</h3>
-                <p class="text-gray-400 font-light leading-relaxed">Tiếng trống tùng cheng rộn rã, nhịp bước múa lân sư rồng hân hoan rước đèn. Một mùa lễ hội ngập tràn màu sắc.</p>
+            <!-- Mũi tên cuộn -->
+            <div class="absolute bottom-10 animate-bounce text-amber-500/70 text-2xl">
+                <i class="fa-solid fa-chevron-down"></i>
             </div>
-
-            <!-- Ô 3: Tiếng Vui -->
-            <div class="glass-card rounded-2xl p-8 text-center group">
-                <div class="w-16 h-16 mx-auto mb-6 rounded-full bg-green-500/10 flex items-center justify-center text-green-400 text-3xl group-hover:bg-green-500/20 transition-all duration-300">
-                    <i class="fa-solid fa-moon"></i>
-                </div>
-                <h3 class="serif text-2xl text-green-300 mb-4">Tiếng Vui</h3>
-                <p class="text-gray-400 font-light leading-relaxed">Mâm cỗ trông trăng ngập tràn bánh dẻo, bánh nướng. Tiếng cười đùa phá cỗ quây quần bên gia đình thật ấm áp.</p>
-            </div>
-
         </section>
+
+        <!-- 2. MEMORIES SECTION (Khu vực Ký Ức) -->
+        <section class="w-full max-w-6xl px-6 py-24 z-10">
+            <div class="text-center mb-16 reveal">
+                <h2 class="font-art text-4xl text-amber-400 mb-4 text-glow">Mảnh Ghép Tuổi Thơ</h2>
+                <div class="w-24 h-1 bg-amber-500 mx-auto rounded-full opacity-50"></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10">
+                <!-- Thẻ 1 -->
+                <div class="glass-card rounded-2xl p-10 text-center reveal">
+                    <div class="w-20 h-20 mx-auto mb-6 rounded-full bg-gradient-to-br from-amber-500/20 to-orange-600/20 flex items-center justify-center text-amber-400 text-4xl shadow-[0_0_20px_rgba(251,191,36,0.2)]">
+                        <i class="fa-solid fa-lightbulb"></i>
+                    </div>
+                    <h3 class="font-art text-2xl text-amber-300 mb-4 font-semibold">Ánh Đèn</h3>
+                    <p class="text-gray-400 font-light leading-relaxed text-sm">Đốm lửa nhỏ thắp sáng chiếc đèn lồng giấy kính. Ánh sáng vàng dịu dàng len lỏi qua từng con ngõ, dẫn lối những giấc mơ con trẻ.</p>
+                </div>
+
+                <!-- Thẻ 2 -->
+                <div class="glass-card rounded-2xl p-10 text-center reveal" style="transition-delay: 0.2s;">
+                    <div class="w-20 h-20 mx-auto mb-6 rounded-full bg-gradient-to-br from-red-500/20 to-pink-600/20 flex items-center justify-center text-red-400 text-4xl shadow-[0_0_20px_rgba(248,113,113,0.2)]">
+                        <i class="fa-solid fa-mask"></i>
+                    </div>
+                    <h3 class="font-art text-2xl text-red-300 mb-4 font-semibold">Sắc Hội</h3>
+                    <p class="text-gray-400 font-light leading-relaxed text-sm">Tiếng trống múa lân rộn rã đầu đình. Ông Địa tươi cười, đoàn rước đèn nối đuôi nhau dài tít tắp dưới ánh trăng vằng vặc.</p>
+                </div>
+
+                <!-- Thẻ 3 -->
+                <div class="glass-card rounded-2xl p-10 text-center reveal" style="transition-delay: 0.4s;">
+                    <div class="w-20 h-20 mx-auto mb-6 rounded-full bg-gradient-to-br from-green-500/20 to-emerald-600/20 flex items-center justify-center text-green-400 text-4xl shadow-[0_0_20px_rgba(74,222,128,0.2)]">
+                        <i class="fa-solid fa-moon"></i>
+                    </div>
+                    <h3 class="font-art text-2xl text-green-300 mb-4 font-semibold">Tiếng Vui</h3>
+                    <p class="text-gray-400 font-light leading-relaxed text-sm">Mâm cỗ trông trăng đầy ắp quả hồng, bánh nướng. Tiếng cười nói giòn tan của cả gia đình quây quần bên hiên nhà.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. WISHES SECTION (Lời Chúc / Cảm Nhận) -->
+        <section class="w-full max-w-4xl px-6 py-24 z-10 reveal">
+            <div class="glass-card rounded-3xl p-8 md:p-12 border-amber-500/30 text-center shadow-[0_0_40px_rgba(251,191,36,0.1)]">
+                <h2 class="font-art text-3xl md:text-4xl text-amber-400 mb-3 text-glow">Gửi Lời Chúc Trăng Rằm</h2>
+                <p class="text-gray-300 font-light mb-8 italic">Viết xuống những tâm tư, lời chúc bình an gửi đến người bạn trân quý.</p>
+                
+                <div class="flex flex-col md:flex-row gap-4 justify-center">
+                    <input type="text" id="wishInput" placeholder="Ví dụ: Chúc gia đình một mùa Trung Thu viên mãn..." 
+                           class="w-full md:w-2/3 px-6 py-4 rounded-full bg-white/5 border border-white/20 text-white focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition-all">
+                    <button id="sendWishBtn" class="px-8 py-4 rounded-full bg-gradient-to-r from-amber-600 to-orange-500 text-white font-semibold hover:from-amber-500 hover:to-orange-400 hover:shadow-[0_0_20px_rgba(251,191,36,0.5)] transition-all transform hover:-translate-y-1">
+                        Gửi Ngay
+                    </button>
+                </div>
+
+                <!-- Bảng chứa lời chúc -->
+                <div id="wishBoard" class="mt-10 flex flex-col gap-4 max-h-80 overflow-y-auto pr-2 custom-scrollbar text-left">
+                    <!-- Lời chúc mẫu -->
+                    <div class="bg-white/5 border border-white/10 rounded-xl p-5 border-l-4 border-l-amber-500">
+                        <p class="text-gray-200">"Chúc mọi người một mùa trăng thật ấm áp bên gia đình!" 🌕</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
     </main>
 
-    <!-- Footer -->
-    <footer class="text-center pb-8 text-gray-500 text-sm z-10">
-        <p>&copy; 2026 Ký Ức Trung Thu. Thiết kế bằng HTML/CSS/JS.</p>
+    <footer class="w-full text-center py-6 text-gray-500 text-sm z-10 pb-10 border-t border-white/10 mt-10">
+        <p class="font-art">&copy; 2026 Ký Ức Trung Thu Storytelling.</p>
     </footer>
 
-    <!-- JAVASCRIPT: Xử lý Âm thanh và Hiệu ứng Canvas Đom Đốm -->
+    <!-- ================= JAVASCRIPT ================= -->
     <script>
-        /* ==========================================
-           1. XỬ LÝ ÂM THANH (AUDIO)
-           ========================================== */
+        /* ---------------------------------------------------
+           1. XỬ LÝ ÂM THANH (Audio Toggle)
+        --------------------------------------------------- */
         const audio = document.getElementById('bgMusic');
-        const audioBtn = document.getElementById('audioToggle');
+        const audioBtn = document.getElementById('audioBtn');
         const audioIcon = document.getElementById('audioIcon');
         let isPlaying = false;
 
         audioBtn.addEventListener('click', () => {
             if (isPlaying) {
                 audio.pause();
-                audioIcon.classList.remove('fa-volume-up');
-                audioIcon.classList.add('fa-volume-xmark');
-                // Tắt hiệu ứng phát sáng của nút
-                audioBtn.classList.remove('border-amber-400', 'bg-amber-400/20');
+                audioIcon.className = 'fa-solid fa-music';
+                audioBtn.classList.remove('music-playing');
             } else {
-                audio.play();
-                audioIcon.classList.remove('fa-volume-xmark');
-                audioIcon.classList.add('fa-volume-up');
-                // Bật hiệu ứng phát sáng cho nút khi có nhạc
-                audioBtn.classList.add('border-amber-400', 'bg-amber-400/20');
+                audio.play().catch(e => console.log("Trình duyệt chặn autoplay:", e));
+                audioIcon.className = 'fa-solid fa-pause';
+                audioBtn.classList.add('music-playing');
             }
             isPlaying = !isPlaying;
         });
 
-        /* ==========================================
-           2. HIỆU ỨNG CANVAS ĐOM ĐỐM (FIREFLIES)
-           ========================================== */
-        const canvas = document.getElementById('firefliesCanvas');
+        /* ---------------------------------------------------
+           2. XỬ LÝ CANVAS (Sao lấp lánh & Đom đóm)
+        --------------------------------------------------- */
+        const canvas = document.getElementById('bgCanvas');
         const ctx = canvas.getContext('2d');
 
-        // Hàm thay đổi kích thước canvas cho vừa với cửa sổ
-        function resizeCanvas() {
+        function resize() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
         }
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
+        window.addEventListener('resize', resize);
+        resize();
 
+        // Mảng chứa các hạt
+        const stars = [];
         const fireflies = [];
-        const numFireflies = 100; // Số lượng đom đốm
 
-        // Lớp đối tượng Đom Đốm
-        class Firefly {
-            constructor() {
-                this.x = Math.random() * canvas.width;
-                this.y = Math.random() * canvas.height;
-                this.size = Math.random() * 2 + 0.5; // Kích thước hạt ngẫu nhiên
-                this.speedX = Math.random() * 1 - 0.5; // Tốc độ lượn ngang
-                this.speedY = Math.random() * 1.5 + 0.5; // Tốc độ bay lên (âm)
-                this.angle = Math.random() * 360; // Góc để lắc lư
-                this.spin = Math.random() * 0.05 + 0.01;
-                
-                // Opacity ngẫu nhiên để lấp lánh
-                this.opacity = Math.random();
-                this.fadeSpeed = Math.random() * 0.02 + 0.005;
-                this.fadeDirection = 1;
-            }
-
-            update() {
-                // Di chuyển lên trên và lắc lư nhẹ
-                this.y -= this.speedY;
-                this.x += Math.sin(this.angle) * 0.5 + this.speedX;
-                this.angle += this.spin;
-
-                // Nếu bay quá mép trên, reset về phía dưới
-                if (this.y < -10) {
-                    this.y = canvas.height + 10;
-                    this.x = Math.random() * canvas.width;
-                }
-                if (this.x < 0) this.x = canvas.width;
-                if (this.x > canvas.width) this.x = 0;
-
-                // Xử lý lấp lánh (fade in / fade out)
-                this.opacity += this.fadeSpeed * this.fadeDirection;
-                if (this.opacity >= 1) {
-                    this.fadeDirection = -1;
-                    this.opacity = 1;
-                }
-                if (this.opacity <= 0.1) {
-                    this.fadeDirection = 1;
-                    this.opacity = 0.1;
-                }
-            }
-
-            draw() {
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                
-                // Hiệu ứng phát sáng lấp lánh
-                ctx.shadowBlur = 15;
-                ctx.shadowColor = '#fbbf24'; // Màu vàng của Tailwind (Amber-400)
-                
-                ctx.fillStyle = `rgba(251, 191, 36, ${this.opacity})`;
-                ctx.fill();
-                
-                // Reset shadow để không ảnh hưởng các vật thể khác
-                ctx.shadowBlur = 0;
-            }
+        // Khởi tạo Sao (Stars) - Cố định, nhấp nháy
+        for (let i = 0; i < 150; i++) {
+            stars.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                radius: Math.random() * 1.5,
+                alpha: Math.random(),
+                alphaChange: (Math.random() * 0.02) + 0.005
+            });
         }
 
-        // Khởi tạo mảng đom đốm
-        function initFireflies() {
-            for (let i = 0; i < numFireflies; i++) {
-                fireflies.push(new Firefly());
-            }
+        // Khởi tạo Đom Đóm (Fireflies) - Bay lơ lửng, màu vàng/cam
+        for (let i = 0; i < 50; i++) {
+            fireflies.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                vx: (Math.random() - 0.5) * 1, // Vận tốc ngang
+                vy: (Math.random() * -1) - 0.5, // Vận tốc dọc (bay lên)
+                radius: Math.random() * 2 + 1,
+                alpha: Math.random()
+            });
         }
 
-        // Vòng lặp Animation
-        function animate() {
-            // Làm mờ nền cũ để tạo vệt di chuyển nhẹ
+        function drawCanvas() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            for (let i = 0; i < fireflies.length; i++) {
-                fireflies[i].update();
-                fireflies[i].draw();
-            }
-            requestAnimationFrame(animate);
-        }
 
-        initFireflies();
-        animate();
+            // Vẽ Sao
+            stars.forEach(star => {
+                star.alpha += star.alphaChange;
+                if (star.alpha <= 0.2 || star.alpha >= 1) star.alphaChange *= -1;
+                
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255, 255, 255, ${star.alpha})`;
+                ctx.fill();
+            });
+
+            // Vẽ Đom Đóm
+            fireflies.forEach(f => {
+                f.x += f.vx;
+                f.y += f.vy;
+                
+                // Hiệu ứng lắc lư ngang (sin wave)
+                f.x += Math.sin(f.y * 0.05) * 0.5;
+
+                // Nếu bay ra khỏi màn hình thì reset
+                if (f.y < -10) f.y = canvas.height + 10;
+                if (f.x < -10) f.x = canvas.width + 10;
+                if (f.x > canvas.width + 10) f.x = -10;
+
+                // Lấp lánh ngẫu nhiên
+                f.alpha = 0.5 + Math.sin(Date.now() * 0.003 + f.x) * 0.5;
+
+                ctx.beginPath();
+                ctx.arc(f.x, f.y, f.radius, 0, Math.PI * 2);
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = '#fbbf24';
+                ctx.fillStyle = `rgba(251, 191, 36, ${f.alpha})`;
+                ctx.fill();
+                ctx.shadowBlur = 0; // Reset
+            });
+
+            requestAnimationFrame(drawCanvas);
+        }
+        drawCanvas();
+
+        /* ---------------------------------------------------
+           3. XỬ LÝ LỜI CHÚC (Thêm lời chúc với Animation)
+        --------------------------------------------------- */
+        const sendWishBtn = document.getElementById('sendWishBtn');
+        const wishInput = document.getElementById('wishInput');
+        const wishBoard = document.getElementById('wishBoard');
+
+        sendWishBtn.addEventListener('click', () => {
+            const text = wishInput.value.trim();
+            if (!text) return;
+
+            // Tạo phần tử div chứa lời chúc
+            const newWish = document.createElement('div');
+            newWish.className = "bg-white/5 border border-white/10 rounded-xl p-5 border-l-4 border-l-amber-500 animate-fade-up";
+            
+            // Nội dung HTML bên trong
+            newWish.innerHTML = `<p class="text-amber-100 shadow-sm">${text}</p>`;
+
+            // Đẩy vào đầu danh sách
+            wishBoard.prepend(newWish);
+
+            // Làm rỗng input
+            wishInput.value = '';
+        });
+        
+        // Cho phép ấn Enter để gửi
+        wishInput.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') sendWishBtn.click();
+        });
+
+        /* ---------------------------------------------------
+           4. SCROLL REVEAL (Hiệu ứng khi cuộn chuột tới)
+        --------------------------------------------------- */
+        const reveals = document.querySelectorAll('.reveal');
+        
+        const revealOnScroll = () => {
+            const windowHeight = window.innerHeight;
+            const elementVisible = 100; // Khoảng cách từ bottom
+
+            reveals.forEach(reveal => {
+                const elementTop = reveal.getBoundingClientRect().top;
+                if (elementTop < windowHeight - elementVisible) {
+                    reveal.classList.add('active');
+                }
+            });
+        };
+
+        window.addEventListener('scroll', revealOnScroll);
+        revealOnScroll(); // Gọi 1 lần lúc tải trang
+
     </script>
 </body>
 </html>
